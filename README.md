@@ -14,8 +14,8 @@ Este é um projeto de exemplo que demonstra como implementar um cache distribuí
 ### 1. Clonar o Repositório
 
 ```bash
-git clone https://github.com/seu-usuario/seu-projeto.git
-cd seu-projeto
+git clone [https://github.com/fabiosalomaosilva/TesteCacheRedisDecorator](https://github.com/fabiosalomaosilva/TesteCacheRedisDecorator)
+cd TesteCacheRedisDecorator
 ```
 
 ### 2. Instalar Dependências
