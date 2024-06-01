@@ -60,13 +60,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Configurar o Redis
-builder.Services.AddStackExchangeRedisCache(options =>
-{
-    options.Configuration = builder.Configuration.GetConnectionString("Redis");
-    options.InstanceName = builder.Configuration["Redis:InstanceName"];
-});
-
 // Registro de serviços
 builder.Services.AddTransient<IRepository<Pessoa>, PessoaRepository>();
 builder.Services.Decorate<IRepository<Pessoa>, CachedPessoaRepository>();
