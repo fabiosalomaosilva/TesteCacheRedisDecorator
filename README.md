@@ -56,22 +56,32 @@ Adicione a configuração do SQLite e do Redis no `Program.cs`:
 ```csharp
 var builder = WebApplication.CreateBuilder(args);
 
-// Configurar o SQLite
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+// Add services to the container.
+
+builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Registro de serviços
-builder.Services.AddTransient<IRepository<Pessoa>, PessoaRepository>();
-builder.Services.Decorate<IRepository<Pessoa>, CachedPessoaRepository>();
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("Redis");
+    options.InstanceName = builder.Configuration["Redis:InstanceName"];
+});
 
-// Adicionar serviços ao contêiner
 builder.Services.AddControllers();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+//Services
+builder.Services.AddTransient<RedisContext>();
+builder.Services.AddTransient<IRepository<Pessoa>, PessoaRepository>();
+builder.Services.AddTransient<IRepository<Endereco>, EnderecoRepository>();
+builder.Services.Decorate(typeof(IRepository<>), typeof(CachedRepository<>));
+
+
 var app = builder.Build();
 
-// Configuração do pipeline de requisição HTTP
+// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -79,8 +89,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
 app.UseAuthorization();
+
 app.MapControllers();
+
 app.Run();
 ```
 
@@ -114,44 +127,67 @@ A aplicação estará disponível em `https://localhost:5001` (ou `http://localh
 
 Você pode interagir com a API utilizando ferramentas como Postman ou curl. Aqui estão alguns exemplos de endpoints:
 
-### 1. Obter Todos os Produtos
+### 1. Obter Todos as Pessoas
 
 ```http
-GET /api/products
+GET /api/pessoas
 ```
 
-### 2. Obter Produto por ID
+### 2. Obter Pessoa por ID
 
 ```http
-GET /api/products/{id}
+GET /api/pessoas/{id}
 ```
 
-### 3. Adicionar Novo Produto
+### 3. Adicionar Nova Pessoa
 
 ```http
-POST /api/products
+POST /api/pessoas
 Content-Type: application/json
 
 {
-  "name": "Novo Produto",
-  "price": 100.0
+  "idPessoa": 0,
+  "nome": "string",
+  "idade": 0,
+  "tipoPessoa": 0,
+  "enderecos": [
+    {
+      "idEndereco": 0,
+      "logradouro": "string",
+      "numero": "string",
+      "bairro": "string",
+      "idPessoa": 0,
+      "pessoa": "string"
+    }
+  ]
 }
 ```
 
-### 4. Atualizar Produto
+### 4. Atualizar Pessoa
 
 ```http
-PUT /api/products/{id}
+PUT /api/pessoas/{id}
 Content-Type: application/json
 
 {
-  "id": 1,
-  "name": "Produto Atualizado",
-  "price": 150.0
+  "idPessoa": 0,
+  "nome": "string",
+  "idade": 0,
+  "tipoPessoa": 0,
+  "enderecos": [
+    {
+      "idEndereco": 0,
+      "logradouro": "string",
+      "numero": "string",
+      "bairro": "string",
+      "idPessoa": 0,
+      "pessoa": "string"
+    }
+  ]
 }
 ```
 
-### 5. Deletar Produto
+### 5. Deletar Pessoa
 
 ```http
 DELETE /api/products/{id}
